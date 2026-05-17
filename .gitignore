@@ -1,0 +1,17 @@
+# Environment files — never commit real secrets
+.env
+.env.prod
+.env.staging
+
+# Backup files
+backups/
+
+# Editor / OS
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs
+*.log

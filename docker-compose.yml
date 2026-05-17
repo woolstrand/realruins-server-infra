@@ -1,0 +1,186 @@
+# woolstrand.art infrastructure
+#
+# Single-VPS Docker Compose setup:
+#   Vapor 4 API  |  WordPress blog  |  MySQL  |  Caddy reverse proxy
+#   Production and staging environments on the same host
+#
+# ── Profiles ────────────────────────────────────────────────────────────────
+#   prod    – production services (vapor-prod, wordpress-prod)
+#   staging – staging  services  (vapor-staging, phpmyadmin)
+#
+#   Services with no profile (caddy, mysql) always start.
+#
+# ── Usage ───────────────────────────────────────────────────────────────────
+#   docker compose --profile prod    up -d          # start/update production
+#   docker compose --profile staging up -d          # start/update staging
+#   docker compose --profile prod --profile staging up -d  # both
+#
+# ── Prerequisites ────────────────────────────────────────────────────────────
+#   1. Copy .env.example to .env and fill in every value.
+#   2. See docs/setup.md for first-time VPS setup.
+#   3. See docs/deployment.md for day-to-day deployment instructions.
+
+name: woolstrand
+
+# ── Networks ─────────────────────────────────────────────────────────────────
+# web      – Caddy ↔ application containers (reverse-proxy traffic)
+# internal – application containers ↔ MySQL  (DB traffic, not exposed publicly)
+networks:
+  web:
+  internal:
+
+# ── Volumes ──────────────────────────────────────────────────────────────────
+volumes:
+  mysql_data:
+  wordpress_prod_uploads:
+  caddy_data:
+  caddy_config:
+
+services:
+
+  # ── Reverse proxy ──────────────────────────────────────────────────────────
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - web
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Database ───────────────────────────────────────────────────────────────
+  # MySQL is on the internal network only — never exposed to the host or internet.
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # Passed through to the init script (mysql/init/01-init.sh):
+      MYSQL_PROD_DB:           ${PROD_DB_NAME}
+      MYSQL_PROD_USER:         ${PROD_DB_USER}
+      MYSQL_PROD_PASSWORD:     ${PROD_DB_PASSWORD}
+      MYSQL_PROD_WP_DB:        ${PROD_WP_DB_NAME}
+      MYSQL_PROD_WP_USER:      ${PROD_WP_DB_USER}
+      MYSQL_PROD_WP_PASSWORD:  ${PROD_WP_DB_PASSWORD}
+      MYSQL_STAGING_DB:        ${STAGING_DB_NAME}
+      MYSQL_STAGING_USER:      ${STAGING_DB_USER}
+      MYSQL_STAGING_PASSWORD:  ${STAGING_DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Production ─────────────────────────────────────────────────────────────
+
+  vapor-prod:
+    image: ${PROD_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-api:latest}
+    restart: unless-stopped
+    profiles: [prod]
+    environment:
+      DATABASE_HOST:     mysql
+      DATABASE_PORT:     "3306"
+      DATABASE_NAME:     ${PROD_DB_NAME}
+      DATABASE_USERNAME: ${PROD_DB_USER}
+      DATABASE_PASSWORD: ${PROD_DB_PASSWORD}
+      APP_ENV:           production
+    depends_on:
+      - mysql
+    networks:
+      - web
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  wordpress-prod:
+    image: wordpress:6-apache
+    restart: unless-stopped
+    profiles: [prod]
+    environment:
+      WORDPRESS_DB_HOST:     mysql:3306
+      WORDPRESS_DB_USER:     ${PROD_WP_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${PROD_WP_DB_PASSWORD}
+      WORDPRESS_DB_NAME:     ${PROD_WP_DB_NAME}
+      # Domain switch: to move from new.woolstrand.art → woolstrand.art,
+      # update WP_HOME / WP_SITEURL here AND the Caddyfile, then reload Caddy.
+      # $$ is the Docker Compose escape for a literal $ in variable values.
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_HOME',  'https://new.woolstrand.art/blog');
+        define('WP_SITEURL','https://new.woolstrand.art');
+        define('FORCE_SSL_ADMIN', true);
+        if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($$_SERVER['HTTP_X_FORWARDED_PROTO'],'https') !== false) {
+          $$_SERVER['HTTPS'] = 'on';
+        }
+    depends_on:
+      - mysql
+    volumes:
+      - wordpress_prod_uploads:/var/www/html/wp-content/uploads
+    networks:
+      - web
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Staging ────────────────────────────────────────────────────────────────
+
+  vapor-staging:
+    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-api:staging}
+    restart: unless-stopped
+    profiles: [staging]
+    environment:
+      DATABASE_HOST:     mysql
+      DATABASE_PORT:     "3306"
+      DATABASE_NAME:     ${STAGING_DB_NAME}
+      DATABASE_USERNAME: ${STAGING_DB_USER}
+      DATABASE_PASSWORD: ${STAGING_DB_PASSWORD}
+      APP_ENV:           staging
+    depends_on:
+      - mysql
+    networks:
+      - web
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  phpmyadmin:
+    image: phpmyadmin:5-apache
+    restart: unless-stopped
+    profiles: [staging]
+    environment:
+      PMA_HOST:     mysql
+      PMA_PORT:     "3306"
+      UPLOAD_LIMIT: 128M
+    depends_on:
+      - mysql
+    networks:
+      - web
+      - internal
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
