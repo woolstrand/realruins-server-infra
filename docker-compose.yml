@@ -98,6 +98,9 @@ services:
       DATABASE_NAME:     ${PROD_DB_NAME}
       DATABASE_USERNAME: ${PROD_DB_USER}
       DATABASE_PASSWORD: ${PROD_DB_PASSWORD}
+      MYSQL_PASSWORD:    ${PROD_MYSQL_PASSWORD}
+      S3_API_KEY:        ${PROD_S3_API_KEY}
+      S3_API_SECRET:     ${PROD_S3_API_SECRET}
       APP_ENV:           production
     depends_on:
       - mysql
@@ -154,6 +157,9 @@ services:
       DATABASE_NAME:     ${STAGING_DB_NAME}
       DATABASE_USERNAME: ${STAGING_DB_USER}
       DATABASE_PASSWORD: ${STAGING_DB_PASSWORD}
+      MYSQL_PASSWORD:    ${STAGING_MYSQL_PASSWORD}
+      S3_API_KEY:        ${STAGING_S3_API_KEY}
+      S3_API_SECRET:     ${STAGING_S3_API_SECRET}
       APP_ENV:           staging
     depends_on:
       - mysql
