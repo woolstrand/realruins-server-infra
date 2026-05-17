@@ -1,0 +1,84 @@
+# woolstrand.art — Caddy reverse-proxy configuration
+#
+# ── Domain switch guide ──────────────────────────────────────────────────────
+# To switch from new.woolstrand.art → woolstrand.art:
+#   1. Update DNS: point woolstrand.art (A/AAAA) to this VPS.
+#   2. Replace every occurrence of "new.woolstrand.art" with "woolstrand.art"
+#      in this file.
+#   3. Update WORDPRESS_CONFIG_EXTRA in docker-compose.yml the same way.
+#   4. Reload: docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+#
+# ── API subdomain note ───────────────────────────────────────────────────────
+# api.woolstrand.art always points to the production Vapor app regardless of
+# whether the main domain is new.woolstrand.art or woolstrand.art.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Production ────────────────────────────────────────────────────────────────
+
+# Main site — new.woolstrand.art
+# Routes:
+#   /blog*          → WordPress (blog homepage + all posts/pages)
+#   /wp-admin*      → WordPress (admin panel — WP_SITEURL is at root)
+#   /wp-includes*   → WordPress (core assets)
+#   /wp-content*    → WordPress (themes, plugins, uploads)
+#   /wp-login.php   → WordPress (login page)
+#   /wp-cron.php    → WordPress (cron endpoint)
+#   /xmlrpc.php     → WordPress (XML-RPC; disable if unused)
+#   /* (catch-all)  → Vapor API (handles /, /view/*, and all API routes)
+new.woolstrand.art {
+    # WordPress blog at /blog path.
+    # WP_HOME  = https://new.woolstrand.art/blog  (public blog URL)
+    # WP_SITEURL = https://new.woolstrand.art      (WordPress core at root)
+    # Caddy does NOT strip the /blog prefix; WordPress's .htaccess uses
+    # RewriteBase / and REQUEST_URI is preserved, so WP handles /blog/* correctly.
+    handle /blog* {
+        reverse_proxy wordpress-prod:80
+    }
+
+    # WordPress system paths (required because WP_SITEURL has no /blog prefix)
+    handle /wp-admin* {
+        reverse_proxy wordpress-prod:80
+    }
+    handle /wp-includes* {
+        reverse_proxy wordpress-prod:80
+    }
+    handle /wp-content* {
+        reverse_proxy wordpress-prod:80
+    }
+    handle /wp-login.php {
+        reverse_proxy wordpress-prod:80
+    }
+    handle /wp-cron.php {
+        reverse_proxy wordpress-prod:80
+    }
+    handle /xmlrpc.php {
+        reverse_proxy wordpress-prod:80
+    }
+
+    # Vapor app — handles /, /view/*, and all other API paths
+    handle {
+        reverse_proxy vapor-prod:8080
+    }
+}
+
+# Dedicated API subdomain — preserved before and after domain migration
+api.woolstrand.art {
+    reverse_proxy vapor-prod:8080
+}
+
+# ── Staging ───────────────────────────────────────────────────────────────────
+
+# Staging API + user-facing Vapor app
+staging.woolstrand.art {
+    reverse_proxy vapor-staging:8080
+}
+
+# phpMyAdmin — staging database admin UI
+# Restrict to trusted IPs in production by uncommenting the block below:
+#
+#   @blocked not remote_ip 203.0.113.1/32
+#   respond @blocked "Access denied" 403
+#
+db.woolstrand.art {
+    reverse_proxy phpmyadmin:80
+}
