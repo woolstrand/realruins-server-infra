@@ -13,6 +13,27 @@ Day-to-day workflow for deploying and managing the woolstrand.art infrastructure
 
 ---
 
+## Automatic service restart
+
+All Vapor (and other) containers are configured with `restart: unless-stopped`.
+Docker will automatically restart them if they crash or exit unexpectedly —
+providing the same protection that `supervisor` gave previously. No additional
+process manager is required.
+
+To verify the restart policy for a running container:
+
+```bash
+docker inspect --format '{{.HostConfig.RestartPolicy.Name}}' woolstrand-vapor-prod-1
+```
+
+To manually restart a service:
+
+```bash
+docker compose restart vapor-prod    # or vapor-staging
+```
+
+---
+
 ## Deploy production
 
 ```bash

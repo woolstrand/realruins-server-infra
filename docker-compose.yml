@@ -89,7 +89,7 @@ services:
   # ── Production ─────────────────────────────────────────────────────────────
 
   vapor-prod:
-    image: ${PROD_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-api:latest}
+    image: ${PROD_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:latest}
     restart: unless-stopped
     profiles: [prod]
     environment:
@@ -103,6 +103,8 @@ services:
       MYSQL_PASSWORD:    ${PROD_MYSQL_PASSWORD}
       S3_API_KEY:        ${PROD_S3_API_KEY}
       S3_API_SECRET:     ${PROD_S3_API_SECRET}
+      S3_BUCKET:         ${PROD_S3_BUCKET}
+      S3_REGION:         ${PROD_S3_REGION}
       APP_ENV:           production
     depends_on:
       - mysql
@@ -150,7 +152,7 @@ services:
   # ── Staging ────────────────────────────────────────────────────────────────
 
   vapor-staging:
-    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-api:staging}
+    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:latest}
     restart: unless-stopped
     profiles: [staging]
     environment:
@@ -164,6 +166,8 @@ services:
       MYSQL_PASSWORD:    ${STAGING_MYSQL_PASSWORD}
       S3_API_KEY:        ${STAGING_S3_API_KEY}
       S3_API_SECRET:     ${STAGING_S3_API_SECRET}
+      S3_BUCKET:         ${STAGING_S3_BUCKET}
+      S3_REGION:         ${STAGING_S3_REGION}
       APP_ENV:           staging
     depends_on:
       - mysql
