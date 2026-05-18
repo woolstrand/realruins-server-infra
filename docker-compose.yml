@@ -149,7 +149,7 @@ services:
   # ── Staging ────────────────────────────────────────────────────────────────
 
   vapor-staging:
-    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:latest}
+    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:staging}
     restart: unless-stopped
     profiles: [staging]
     environment:
