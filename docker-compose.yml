@@ -89,7 +89,7 @@ services:
   # ── Production ─────────────────────────────────────────────────────────────
 
   vapor-prod:
-    image: ${PROD_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-api:latest}
+    image: ${PROD_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:latest}
     restart: unless-stopped
     profiles: [prod]
     environment:
@@ -97,12 +97,11 @@ services:
       DATABASE_PORT:     "3306"
       DATABASE_NAME:     ${PROD_DB_NAME}
       DATABASE_USERNAME: ${PROD_DB_USER}
-      # DATABASE_PASSWORD — used by the Vapor/Fluent ORM connection.
       DATABASE_PASSWORD: ${PROD_DB_PASSWORD}
-      # MYSQL_PASSWORD — used by the Vapor mysql-kit driver (separate env key).
-      MYSQL_PASSWORD:    ${PROD_MYSQL_PASSWORD}
       S3_API_KEY:        ${PROD_S3_API_KEY}
       S3_API_SECRET:     ${PROD_S3_API_SECRET}
+      S3_BUCKET:         ${PROD_S3_BUCKET}
+      S3_REGION:         ${PROD_S3_REGION}
       APP_ENV:           production
     depends_on:
       - mysql
@@ -150,7 +149,7 @@ services:
   # ── Staging ────────────────────────────────────────────────────────────────
 
   vapor-staging:
-    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-api:staging}
+    image: ${STAGING_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:latest}
     restart: unless-stopped
     profiles: [staging]
     environment:
@@ -158,12 +157,11 @@ services:
       DATABASE_PORT:     "3306"
       DATABASE_NAME:     ${STAGING_DB_NAME}
       DATABASE_USERNAME: ${STAGING_DB_USER}
-      # DATABASE_PASSWORD — used by the Vapor/Fluent ORM connection.
       DATABASE_PASSWORD: ${STAGING_DB_PASSWORD}
-      # MYSQL_PASSWORD — used by the Vapor mysql-kit driver (separate env key).
-      MYSQL_PASSWORD:    ${STAGING_MYSQL_PASSWORD}
       S3_API_KEY:        ${STAGING_S3_API_KEY}
       S3_API_SECRET:     ${STAGING_S3_API_SECRET}
+      S3_BUCKET:         ${STAGING_S3_BUCKET}
+      S3_REGION:         ${STAGING_S3_REGION}
       APP_ENV:           staging
     depends_on:
       - mysql
