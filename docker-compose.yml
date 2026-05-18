@@ -162,7 +162,8 @@ services:
       S3_API_SECRET:     ${STAGING_S3_API_SECRET}
       S3_BUCKET:         ${STAGING_S3_BUCKET}
       S3_REGION:         ${STAGING_S3_REGION}
-      APP_ENV:           staging
+      APP_ENV:           production
+      APP_INSTANCE:      staging
     depends_on:
       - mysql
     networks:
