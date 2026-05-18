@@ -79,6 +79,6 @@ staging.woolstrand.art {
 #   @blocked not remote_ip 203.0.113.1/32
 #   respond @blocked "Access denied" 403
 #
-db.woolstrand.art {
+db.staging.woolstrand.art {
     reverse_proxy phpmyadmin:80
 }
