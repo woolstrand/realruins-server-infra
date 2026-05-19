@@ -69,8 +69,23 @@ api.woolstrand.art {
 # ── Staging ───────────────────────────────────────────────────────────────────
 
 # Staging API + user-facing Vapor app
+#
+# transport keepalive off — forces a fresh TCP connection to vapor-staging for
+#   every request, avoiding 502 errors caused by stale keep-alive connections.
+#   Postman aggressively reuses TLS sessions and HTTP keep-alive connections; if
+#   vapor's idle keep-alive timeout fires between requests Caddy may hold a dead
+#   connection and fail to forward the request body (seen as "unexpected EOF").
+#
+# flush_interval -1 — stream response bytes back to the client immediately
+#   rather than buffering them, which is preferable for binary (octet-stream)
+#   payloads and avoids unnecessary response-buffering delays.
 staging.woolstrand.art {
-    reverse_proxy vapor-staging:8080
+    reverse_proxy vapor-staging:8080 {
+        flush_interval -1
+        transport http {
+            keepalive off
+        }
+    }
 }
 
 # phpMyAdmin — staging database admin UI
