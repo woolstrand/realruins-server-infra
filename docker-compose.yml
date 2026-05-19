@@ -123,12 +123,12 @@ services:
       WORDPRESS_DB_USER:     ${PROD_WP_DB_USER}
       WORDPRESS_DB_PASSWORD: ${PROD_WP_DB_PASSWORD}
       WORDPRESS_DB_NAME:     ${PROD_WP_DB_NAME}
-      # Domain switch: to move from new.woolstrand.art → woolstrand.art,
-      # update WP_HOME / WP_SITEURL here AND the Caddyfile, then reload Caddy.
+      # Domain switch: to move to a different main domain, update WP_HOME / WP_SITEURL
+      # here AND the Caddyfile, then reload Caddy.
       # $$ is the Docker Compose escape for a literal $ in variable values.
       WORDPRESS_CONFIG_EXTRA: |
-        define('WP_HOME',  'https://new.woolstrand.art/blog');
-        define('WP_SITEURL','https://new.woolstrand.art');
+        define('WP_HOME',  'https://woolstrand.art/blog');
+        define('WP_SITEURL','https://woolstrand.art');
         define('FORCE_SSL_ADMIN', true);
         if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($$_SERVER['HTTP_X_FORWARDED_PROTO'],'https') !== false) {
           $$_SERVER['HTTPS'] = 'on';

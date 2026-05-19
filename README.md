@@ -12,11 +12,11 @@ Internet
    │
    ▼
 Caddy (80 / 443 / 443 UDP)
-   ├── new.woolstrand.art          → vapor-prod  :8080
-   ├── new.woolstrand.art/blog*    → wordpress-prod :80
-   ├── api.woolstrand.art          → vapor-prod  :8080
-   ├── staging.woolstrand.art      → vapor-staging :8080
-   └── db.woolstrand.art           → phpmyadmin  :80
+   ├── woolstrand.art             → vapor-prod  :8080
+   ├── woolstrand.art/blog*       → wordpress-prod :80
+   ├── api.woolstrand.art         → vapor-prod  :8080
+   ├── staging.woolstrand.art     → vapor-staging :8080
+   └── db.woolstrand.art          → phpmyadmin  :80
 
 Internal network (not exposed):
    vapor-prod, vapor-staging, wordpress-prod, phpmyadmin
@@ -121,8 +121,8 @@ docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
 
 ## Domain migration
 
-To switch from `new.woolstrand.art` → `woolstrand.art`, follow the steps in
-[docs/deployment.md § Domain migration](docs/deployment.md#domain-migration-newwoolstrandart--woolstrandart).
+To switch to a different main domain in the future, follow the steps in
+[docs/deployment.md § Domain migration](docs/deployment.md#domain-migration).
 
 ---
 

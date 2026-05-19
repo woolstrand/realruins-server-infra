@@ -94,15 +94,17 @@ docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
 
 ---
 
-## Domain migration: new.woolstrand.art → woolstrand.art
+## Domain migration
 
-1. Update DNS: point `woolstrand.art` A/AAAA records to the VPS IP.
-2. In `caddy/Caddyfile`, replace every occurrence of `new.woolstrand.art`
-   with `woolstrand.art`.
+To change the main production domain (currently `woolstrand.art`):
+
+1. Update DNS: point the new domain (A/AAAA records) to the VPS IP.
+2. In `caddy/Caddyfile`, replace `woolstrand.art` (but NOT `api.woolstrand.art`
+   or `staging.woolstrand.art`) with the new domain.
 3. In `docker-compose.yml`, update `WORDPRESS_CONFIG_EXTRA`:
    ```yaml
-   define('WP_HOME',   'https://woolstrand.art/blog');
-   define('WP_SITEURL','https://woolstrand.art');
+   define('WP_HOME',   'https://<new-domain>/blog');
+   define('WP_SITEURL','https://<new-domain>');
    ```
 4. Reload Caddy:
    ```bash
@@ -114,8 +116,8 @@ docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
    ```
 6. In WordPress admin (Settings → Permalinks) click **Save Changes**.
 
-> `api.woolstrand.art` requires no changes — it is always a separate record
-> pointing to the same VPS.
+> `api.woolstrand.art` and `staging.woolstrand.art` are independent of the main
+> domain and require no changes — they always point to their respective Vapor apps.
 
 ---
 

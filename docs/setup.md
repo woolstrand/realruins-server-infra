@@ -72,10 +72,10 @@ needs DNS to propagate for automatic HTTPS):
 
 | Record | Type | Value |
 |--------|------|-------|
-| `new.woolstrand.art` | A | `<VPS IP>` |
+| `woolstrand.art` | A | `<VPS IP>` |
 | `api.woolstrand.art` | A | `<VPS IP>` |
 | `staging.woolstrand.art` | A | `<VPS IP>` |
-| `db.woolstrand.art` | A | `<VPS IP>` |
+| `db.staging.woolstrand.art` | A | `<VPS IP>` |
 
 ---
 
@@ -115,11 +115,11 @@ has propagated.
 
 After the WordPress container starts for the first time:
 
-1. Navigate to `https://new.woolstrand.art/blog/wp-admin/install.php`
+1. Navigate to `https://woolstrand.art/blog/wp-admin/install.php`
 2. Complete the installation wizard.
 3. In **Settings → General** confirm that:
-   - **WordPress Address (URL)** is `https://new.woolstrand.art`
-   - **Site Address (URL)**      is `https://new.woolstrand.art/blog`
+   - **WordPress Address (URL)** is `https://woolstrand.art`
+   - **Site Address (URL)**      is `https://woolstrand.art/blog`
 4. Go to **Settings → Permalinks** and click **Save Changes** to regenerate
    the `.htaccess` rewrite rules.
 
