@@ -1,21 +1,21 @@
 # woolstrand.art — Caddy reverse-proxy configuration
 #
 # ── Domain switch guide ──────────────────────────────────────────────────────
-# To switch from new.woolstrand.art → woolstrand.art:
-#   1. Update DNS: point woolstrand.art (A/AAAA) to this VPS.
-#   2. Replace every occurrence of "new.woolstrand.art" with "woolstrand.art"
-#      in this file.
+# To switch from woolstrand.art → a different domain in the future:
+#   1. Update DNS: point the new domain (A/AAAA) to this VPS.
+#   2. Replace every occurrence of "woolstrand.art" with the new domain
+#      in this file (but NOT api.woolstrand.art or staging.woolstrand.art).
 #   3. Update WORDPRESS_CONFIG_EXTRA in docker-compose.yml the same way.
 #   4. Reload: docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
 #
 # ── API subdomain note ───────────────────────────────────────────────────────
-# api.woolstrand.art always points to the production Vapor app regardless of
-# whether the main domain is new.woolstrand.art or woolstrand.art.
+# api.woolstrand.art and staging.woolstrand.art always point to their
+# respective Vapor apps and are independent of the main domain.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Production ────────────────────────────────────────────────────────────────
 
-# Main site — new.woolstrand.art
+# Main site — woolstrand.art
 # Routes:
 #   /blog*          → WordPress (blog homepage + all posts/pages)
 #   /wp-admin*      → WordPress (admin panel — WP_SITEURL is at root)
@@ -25,10 +25,10 @@
 #   /wp-cron.php    → WordPress (cron endpoint)
 #   /xmlrpc.php     → WordPress (XML-RPC; disable if unused)
 #   /* (catch-all)  → Vapor API (handles /, /view/*, and all API routes)
-new.woolstrand.art {
+woolstrand.art {
     # WordPress blog at /blog path.
-    # WP_HOME  = https://new.woolstrand.art/blog  (public blog URL)
-    # WP_SITEURL = https://new.woolstrand.art      (WordPress core at root)
+    # WP_HOME  = https://woolstrand.art/blog  (public blog URL)
+    # WP_SITEURL = https://woolstrand.art      (WordPress core at root)
     # Caddy does NOT strip the /blog prefix; WordPress's .htaccess uses
     # RewriteBase / and REQUEST_URI is preserved, so WP handles /blog/* correctly.
     handle /blog* {
