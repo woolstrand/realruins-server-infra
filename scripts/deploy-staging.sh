@@ -4,7 +4,7 @@
 # Usage: ./scripts/deploy-staging.sh
 #
 # What this does:
-#   1. Pulls the latest images for staging services.
+#   1. Pulls the latest images for staging services (--pull always).
 #   2. Starts / recreates staging containers (vapor-staging, phpmyadmin)
 #      and the shared infrastructure (caddy, mysql) if not already running.
 #   3. Removes any orphaned containers from previous deployments.
@@ -22,11 +22,8 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
-echo "==> [staging] Pulling latest images..."
-docker compose --profile staging pull
-
-echo "==> [staging] Starting staging services..."
-docker compose --profile staging up -d --remove-orphans
+echo "==> [staging] Starting staging services (pulling latest images)..."
+docker compose --profile staging up -d --pull always --remove-orphans
 
 echo ""
 echo "==> [staging] Service status:"
