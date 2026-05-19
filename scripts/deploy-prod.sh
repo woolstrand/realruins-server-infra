@@ -4,7 +4,7 @@
 # Usage: ./scripts/deploy-prod.sh
 #
 # What this does:
-#   1. Pulls the latest images for production services.
+#   1. Pulls the latest images for production services (--pull always).
 #   2. Starts / recreates production containers (vapor-prod, wordpress-prod)
 #      and the shared infrastructure (caddy, mysql) if not already running.
 #   3. Removes any orphaned containers from previous deployments.
@@ -22,11 +22,8 @@ if [[ ! -f .env ]]; then
   exit 1
 fi
 
-echo "==> [prod] Pulling latest images..."
-docker compose --profile prod pull
-
-echo "==> [prod] Starting production services..."
-docker compose --profile prod up -d --remove-orphans
+echo "==> [prod] Starting production services (pulling latest images)..."
+docker compose --profile prod up -d --pull always --remove-orphans
 
 echo ""
 echo "==> [prod] Service status:"
