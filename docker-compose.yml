@@ -63,6 +63,10 @@ services:
   mysql:
     image: mysql:8.0
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       # Passed through to the init script (mysql/init/01-init.sh):
@@ -90,6 +94,10 @@ services:
 
   vapor-prod:
     image: ${PROD_VAPOR_IMAGE:-ghcr.io/woolstrand/realruins-server:latest}
+    deploy:
+      resources:
+        limits:
+          memory: 500M
     restart: unless-stopped
     profiles: [prod]
     environment:
