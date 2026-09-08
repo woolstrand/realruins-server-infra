@@ -82,3 +82,12 @@ staging.woolstrand.art {
 db.staging.woolstrand.art {
     reverse_proxy phpmyadmin:80
 }
+
+# -- One Tap Tips ------
+ott.woolstrand.art {
+    reverse_proxy onetaptips-prod:3000
+}
+
+staging.ott.woolstrand.art {
+    reverse_proxy onetaptips-staging:3000
+}
