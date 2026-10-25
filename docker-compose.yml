@@ -110,6 +110,7 @@ services:
       S3_API_SECRET:     ${PROD_S3_API_SECRET}
       S3_BUCKET:         ${PROD_S3_BUCKET}
       S3_REGION:         ${PROD_S3_REGION}
+      PATREON_ACCESS_TOKEN: ${PROD_PATREON_ACCESS_TOKEN}
       APP_ENV:           production
     depends_on:
       - mysql
@@ -170,6 +171,7 @@ services:
       S3_API_SECRET:     ${STAGING_S3_API_SECRET}
       S3_BUCKET:         ${STAGING_S3_BUCKET}
       S3_REGION:         ${STAGING_S3_REGION}
+      PATREON_ACCESS_TOKEN: ${STAGING_PATREON_ACCESS_TOKEN}
       APP_ENV:           production
       APP_INSTANCE:      staging
     depends_on:

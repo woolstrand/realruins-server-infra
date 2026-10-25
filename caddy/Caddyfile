@@ -85,9 +85,15 @@ db.staging.woolstrand.art {
 
 # -- One Tap Tips ------
 ott.woolstrand.art {
-    reverse_proxy onetaptips-prod:3000
+    reverse_proxy onetaptips-prod-web:3000
 }
 
 staging.ott.woolstrand.art {
-    reverse_proxy onetaptips-staging:3000
+    handle /github-webhook/* {
+        reverse_proxy onetaptips-webhook:9000
+    }
+
+    handle {
+        reverse_proxy onetaptips-staging-web:3000
+    }
 }
