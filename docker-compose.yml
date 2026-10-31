@@ -203,3 +203,28 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  # Runs periodic jobs against vapor-staging over the web network.
+  # Jobs are defined in scheduler/crontab-staging.
+  scheduler-staging:
+    image: alpine:3
+    restart: unless-stopped
+    profiles: [staging]
+    # crond ignores a bind-mounted /etc/crontabs/root (owned by the host user, not
+    # root), so install it with `crontab` on start instead.
+    command: ["sh", "-c", "crontab /etc/scheduler/crontab && exec crond -f -d 6"]
+    volumes:
+      - ./scheduler/crontab-staging:/etc/scheduler/crontab:ro
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+    depends_on:
+      - vapor-staging
+    networks:
+      - web
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

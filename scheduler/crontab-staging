@@ -1,0 +1,8 @@
+# Crontab for the scheduler-staging container (BusyBox crond, UTC).
+# Mounted read-only; after editing: docker compose restart scheduler-staging
+# Job output goes to the container log: docker compose logs scheduler-staging
+#
+# min hour dom mon dow  command
+
+# Regenerate the Patreon progress dashboard image every 12 hours.
+0 0,12 * * * wget -q -O - -T 120 http://vapor-staging:8080/generateProgressDashboard >/proc/1/fd/1 2>&1; echo " exit=$?" >/proc/1/fd/1
