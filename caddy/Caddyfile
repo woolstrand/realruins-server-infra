@@ -26,34 +26,43 @@
 #   /xmlrpc.php     → WordPress (XML-RPC; disable if unused)
 #   /* (catch-all)  → Vapor API (handles /, /view/*, and all API routes)
 woolstrand.art {
-    # WordPress blog at /blog path.
-    # WP_HOME  = https://woolstrand.art/blog  (public blog URL)
-    # WP_SITEURL = https://woolstrand.art      (WordPress core at root)
-    # Caddy does NOT strip the /blog prefix; WordPress's .htaccess uses
-    # RewriteBase / and REQUEST_URI is preserved, so WP handles /blog/* correctly.
-    handle /blog* {
-        reverse_proxy wordpress-prod:80
+    # WordPress is DISABLED from outside (Oct 2026): the wordpress:6-apache image
+    # in use ships PHP 8.3.31, vulnerable to PHP2Shell (CVE-2026-109618/109619).
+    # To re-enable: pull a patched image (PHP >= 8.3.36), then restore the
+    # commented-out handles below and remove this block.
+    @wordpress path /blog* /wp-admin* /wp-includes* /wp-content* /wp-login.php /wp-cron.php /xmlrpc.php
+    handle @wordpress {
+        respond "Not found" 404
     }
 
-    # WordPress system paths (required because WP_SITEURL has no /blog prefix)
-    handle /wp-admin* {
-        reverse_proxy wordpress-prod:80
-    }
-    handle /wp-includes* {
-        reverse_proxy wordpress-prod:80
-    }
-    handle /wp-content* {
-        reverse_proxy wordpress-prod:80
-    }
-    handle /wp-login.php {
-        reverse_proxy wordpress-prod:80
-    }
-    handle /wp-cron.php {
-        reverse_proxy wordpress-prod:80
-    }
-    handle /xmlrpc.php {
-        reverse_proxy wordpress-prod:80
-    }
+    # # WordPress blog at /blog path.
+    # # WP_HOME  = https://woolstrand.art/blog  (public blog URL)
+    # # WP_SITEURL = https://woolstrand.art      (WordPress core at root)
+    # # Caddy does NOT strip the /blog prefix; WordPress's .htaccess uses
+    # # RewriteBase / and REQUEST_URI is preserved, so WP handles /blog/* correctly.
+    # handle /blog* {
+    #     reverse_proxy wordpress-prod:80
+    # }
+
+    # # WordPress system paths (required because WP_SITEURL has no /blog prefix)
+    # handle /wp-admin* {
+    #     reverse_proxy wordpress-prod:80
+    # }
+    # handle /wp-includes* {
+    #     reverse_proxy wordpress-prod:80
+    # }
+    # handle /wp-content* {
+    #     reverse_proxy wordpress-prod:80
+    # }
+    # handle /wp-login.php {
+    #     reverse_proxy wordpress-prod:80
+    # }
+    # handle /wp-cron.php {
+    #     reverse_proxy wordpress-prod:80
+    # }
+    # handle /xmlrpc.php {
+    #     reverse_proxy wordpress-prod:80
+    # }
 
     # Vapor app — handles /, /view/*, and all other API paths
     handle {
