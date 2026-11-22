@@ -63,6 +63,9 @@ services:
   mysql:
     image: mysql:8.0
     restart: unless-stopped
+    # No replication: binlogs only serve point-in-time recovery, so keep 3 days
+    # instead of the 30-day default (they had grown to ~3.8 GB).
+    command: ["--binlog-expire-logs-seconds=259200"]
     deploy:
       resources:
         limits:
