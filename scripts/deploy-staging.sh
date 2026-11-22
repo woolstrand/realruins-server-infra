@@ -27,6 +27,10 @@ fi
 echo "==> [staging] Starting staging services (pulling latest images)..."
 docker compose --profile staging up -d --pull always --remove-orphans
 
+# The previous image is left untagged after the pull; remove it (and any other
+# dangling images). Build cache is pruned weekly by cron instead.
+docker image prune -f >/dev/null || true
+
 echo ""
 echo "==> [staging] Regenerating progress dashboard..."
 # Retries cover the few seconds Vapor needs to start (Caddy answers 502 meanwhile).

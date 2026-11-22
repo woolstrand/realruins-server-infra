@@ -25,6 +25,10 @@ fi
 echo "==> [prod] Starting production services (pulling latest images)..."
 docker compose --profile prod up -d --pull always --remove-orphans
 
+# The previous image is left untagged after the pull; remove it (and any other
+# dangling images). Build cache is pruned weekly by cron instead.
+docker image prune -f >/dev/null || true
+
 echo ""
 echo "==> [prod] Service status:"
 docker compose ps
